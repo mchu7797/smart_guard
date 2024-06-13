@@ -22,6 +22,7 @@ fn handle_client(mut stream: TcpStream, clients: Arc<Mutex<HashMap<i64, ClientIn
                 let image_size = i64::from_le_bytes(buffer[16..24].try_into().unwrap());
                 let epoch_time_raw = i64::from_le_bytes(buffer[24..32].try_into().unwrap());
                 
+                // Save from korean standard timezone
                 let epoch_time = FixedOffset::east_opt(9 * 3600).unwrap().from_utc_datetime(
                     &DateTime::from_timestamp(epoch_time_raw, 0)
                         .unwrap()
