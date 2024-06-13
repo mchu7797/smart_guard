@@ -1,6 +1,6 @@
 {
     "pylint.args": [
-        "--extension-pkg-whitelist=cv2",
-        "--generate-members"
-    ]
+        "--generate-members",
+    ],
+    "editor.formatOnSave": true,
 }

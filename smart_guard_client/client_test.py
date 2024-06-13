@@ -5,9 +5,8 @@ from enum import Enum
 from struct import pack, unpack
 from os.path import getsize
 from sys import argv
-from time import sleep
+from time import sleep, time
 from random import randint
-from time import time
 
 SERVER_IP = "127.0.0.1"
 SERVER_PORT = 12877
@@ -26,9 +25,11 @@ capture = cv2.VideoCapture(0)
 capture.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
 capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
 
+
 def take_picture(image_path: str):
     result, frame = capture.read()
     cv2.imwrite(image_path, frame)
+
 
 def send_ping(ping_method: PingMethods, client_id: int, image_path: str = None):
     if ping_method == PingMethods.INIT or ping_method == PingMethods.EXIT:
@@ -41,7 +42,9 @@ def send_ping(ping_method: PingMethods, client_id: int, image_path: str = None):
 
         return False
     elif ping_method == PingMethods.WARNING:
-        request_packet = pack("iqqq", ping_method.value, client_id, getsize(image_path), int(time()))
+        request_packet = pack(
+            "iqqq", ping_method.value, client_id, getsize(image_path), int(time())
+        )
         server_socket.send(request_packet)
 
         if server_socket.recv(1)[0] != 1:

@@ -5,8 +5,7 @@ from socket import socket, AF_INET, SOCK_STREAM
 from enum import Enum
 from struct import pack, unpack
 from os.path import getsize
-from time import sleep
-from datetime import datetime, timezone, timedelta
+from time import sleep, time
 
 BH_1750_DEVICE = 0x23
 BH_1750_POWER_DOWN = 0x00
@@ -64,10 +63,8 @@ def take_picture(image_path: str):
 
 
 def send_ping(ping_method: PingMethods, client_id: int, image_path: str = None):
-    current_time = int(datetime.now(timezone(timedelta(hours=9))).timestamp())
-
     if ping_method == PingMethods.INIT or ping_method == PingMethods.EXIT:
-        request_packet = pack("iqqq", ping_method.value, client_id, 0, current_time)
+        request_packet = pack("iqqq", ping_method.value, client_id, 0, int(time()))
         server_socket.send(request_packet)
         result = server_socket.recv(1)
 
@@ -76,7 +73,9 @@ def send_ping(ping_method: PingMethods, client_id: int, image_path: str = None):
 
         return False
     elif ping_method == PingMethods.WARNING:
-        request_packet = pack("iqqq", ping_method.value, client_id, getsize(image_path), current_time)
+        request_packet = pack(
+            "iqqq", ping_method.value, client_id, getsize(image_path), int(time())
+        )
         server_socket.send(request_packet)
 
         if server_socket.recv(1)[0] != 1:
