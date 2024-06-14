@@ -1,4 +1,5 @@
-from cv2 import cv2
+import cv2
+
 from smbus2 import SMBus
 from gpiozero import DistanceSensor
 from socket import socket, AF_INET, SOCK_STREAM
