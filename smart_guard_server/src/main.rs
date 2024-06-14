@@ -1,6 +1,6 @@
 mod client_info;
 
-use chrono::{DateTime, FixedOffset, TimeZone};
+use chrono::{DateTime, FixedOffset, TimeZone, Utc};
 use client_info::ClientInfo;
 use std::collections::HashMap;
 use std::fs::{self, File};
@@ -21,7 +21,7 @@ fn handle_client(mut stream: TcpStream, clients: Arc<Mutex<HashMap<i64, ClientIn
                 let command = i32::from_le_bytes(buffer[0..4].try_into().unwrap());
                 let image_size = i64::from_le_bytes(buffer[16..24].try_into().unwrap());
                 let epoch_time_raw = i64::from_le_bytes(buffer[24..32].try_into().unwrap());
-                
+
                 // Save from korean standard timezone
                 let epoch_time = FixedOffset::east_opt(9 * 3600).unwrap().from_utc_datetime(
                     &DateTime::from_timestamp(epoch_time_raw, 0)
@@ -125,7 +125,12 @@ fn handle_client(mut stream: TcpStream, clients: Arc<Mutex<HashMap<i64, ClientIn
             }
             Err(_) => {
                 println!(
-                    "Client {}: Connection closed by unexpected reason!",
+                    "When {}, Client {}, ID = {}: Connection closed by unexpected reason!",
+                    FixedOffset::east_opt(9 * 3600)
+                        .unwrap()
+                        .from_utc_datetime(&Utc::now().naive_utc())
+                        .format("%F %T"),
+                    stream.peer_addr().unwrap().to_string(),
                     client_id
                 );
                 let mut clients = clients.lock().unwrap();
