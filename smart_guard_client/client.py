@@ -17,8 +17,8 @@ BH_1750_CONTINUOUS_HIGH_RES_MODE = 0x10
 HC_SR04_TRIGGER_PIN = 17
 HC_SR04_ECHO_PIN = 18
 
-CLIENT_ID = int(argv[1])
-SERVER_IP = argv[2]
+CLIENT_ID = int(argv[1]) if len(argv) > 3 else None
+SERVER_IP = argv[2] if len(argv) > 3 else None
 SERVER_PORT = 12877
 
 

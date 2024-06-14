@@ -8,8 +8,8 @@ from sys import argv
 from time import sleep, time
 from random import randint
 
-CLIENT_ID = int(argv[1])
-SERVER_IP = argv[2]
+CLIENT_ID = int(argv[1]) if len(argv) > 3 else None
+SERVER_IP = argv[2] if len(argv) > 3 else None
 SERVER_PORT = 12877
 
 
