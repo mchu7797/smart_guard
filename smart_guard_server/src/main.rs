@@ -67,14 +67,24 @@ fn handle_client(mut stream: TcpStream, clients: Arc<Mutex<HashMap<i64, ClientIn
 
                             client_info.grow_count();
 
-                            // For open image file on windows
-                            let win_path = file_name.replace("/", "\\");
+                            if cfg!(windows) {
+                                // For open image file on windows
+                                let win_path = file_name.replace("/", "\\");
 
-                            // Show image viewer
-                            Command::new("explorer.exe")
-                                .arg(&win_path)
-                                .spawn()
-                                .expect("Failed to open image viewer");
+                                // Show image viewer
+                                Command::new("explorer.exe")
+                                    .arg(&win_path)
+                                    .spawn()
+                                    .expect("Failed to open image viewer");
+                            } else if cfg!(target_os = "macos") {
+                                // Show image viewer
+                                Command::new("open")
+                                    .arg(&file_name)
+                                    .spawn()
+                                    .expect("Failed to open image viewer");
+                            } else {
+                                println!("\tImage Path: {}", file_name);
+                            }
 
                             // Console alert
                             println!(
