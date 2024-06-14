@@ -4,7 +4,7 @@ from smbus2 import SMBus
 from gpiozero import DistanceSensor
 from socket import socket, AF_INET, SOCK_STREAM
 from enum import Enum
-from struct import pack, unpack
+from struct import pack
 from os.path import getsize
 from time import sleep, time
 from sys import argv
@@ -113,9 +113,9 @@ if __name__ == "__main__":
                 take_picture("warning.png")
                 send_ping(PingMethods.WARNING, CLIENT_ID, "warning.png")
                 print("Something detected!")
-            else:
-                current_light = light
-                current_distance = distance
+
+            current_light = light
+            current_distance = distance
 
             sleep(2)
     finally:

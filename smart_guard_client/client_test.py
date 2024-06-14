@@ -2,7 +2,7 @@ import cv2
 
 from socket import socket, AF_INET, SOCK_STREAM
 from enum import Enum
-from struct import pack, unpack
+from struct import pack
 from os.path import getsize
 from sys import argv
 from time import sleep, time
