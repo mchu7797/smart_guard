@@ -6,6 +6,7 @@ from enum import Enum
 from struct import pack, unpack
 from os.path import getsize
 from time import sleep, time
+from sys import argv
 
 BH_1750_DEVICE = 0x23
 BH_1750_POWER_DOWN = 0x00
@@ -15,9 +16,9 @@ BH_1750_CONTINUOUS_HIGH_RES_MODE = 0x10
 HC_SR04_TRIGGER_PIN = 17
 HC_SR04_ECHO_PIN = 18
 
-SERVER_IP = "220.66.59.110"
+CLIENT_ID = int(argv[1])
+SERVER_IP = argv[2]
 SERVER_PORT = 12877
-CLIENT_ID = 1
 
 
 class PingMethods(Enum):
@@ -35,6 +36,10 @@ distance_sensor = DistanceSensor(trigger=HC_SR04_TRIGGER_PIN, echo=HC_SR04_ECHO_
 server_socket = socket(AF_INET, SOCK_STREAM)
 server_socket.connect((SERVER_IP, SERVER_PORT))
 
+capture = cv2.VideoCapture(0)
+capture.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+
 
 def get_light():
     data = i2c_bus.read_i2c_block_data(
@@ -48,18 +53,8 @@ def get_distance():
 
 
 def take_picture(image_path: str):
-    capture = cv2.VideoCapture(0)
-
-    capture.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-    capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
-
-    result, frame = capture.read()
-
+    _, frame = capture.read()
     cv2.imwrite(image_path, frame)
-
-    capture.release()
-
-    cv2.destroyAllWindows()
 
 
 def send_ping(ping_method: PingMethods, client_id: int, image_path: str = None):
@@ -94,6 +89,9 @@ def send_ping(ping_method: PingMethods, client_id: int, image_path: str = None):
 
 
 if __name__ == "__main__":
+    if CLIENT_ID is None or SERVER_IP is None:
+        print("Usage: python client.py [CLIENT_ID] [SERVER_IP]")
+
     try:
         current_light = 0
         current_distance = 0
@@ -125,3 +123,5 @@ if __name__ == "__main__":
 
         i2c_bus.close()
         distance_sensor.close()
+        capture.release()
+        cv2.destroyAllWindows()

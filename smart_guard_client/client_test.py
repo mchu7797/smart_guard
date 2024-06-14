@@ -8,7 +8,8 @@ from sys import argv
 from time import sleep, time
 from random import randint
 
-SERVER_IP = "127.0.0.1"
+CLIENT_ID = int(argv[1])
+SERVER_IP = argv[2]
 SERVER_PORT = 12877
 
 
@@ -27,7 +28,7 @@ capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
 
 
 def take_picture(image_path: str):
-    result, frame = capture.read()
+    _, frame = capture.read()
     cv2.imwrite(image_path, frame)
 
 
@@ -63,7 +64,8 @@ def send_ping(ping_method: PingMethods, client_id: int, image_path: str = None):
 
 
 if __name__ == "__main__":
-    CLIENT_ID = int(argv[1])
+    if CLIENT_ID is None or SERVER_IP is None:
+        print("Usage: python client_test.py [CLIENT_ID] [SERVER_IP]")
 
     try:
         if not send_ping(PingMethods.INIT, CLIENT_ID):
@@ -78,9 +80,8 @@ if __name__ == "__main__":
                 break
 
         sleep(2)
-        send_ping(PingMethods.EXIT, CLIENT_ID)
-
     finally:
+        send_ping(PingMethods.EXIT, CLIENT_ID)
         server_socket.close()
         capture.release()
         cv2.destroyAllWindows()
